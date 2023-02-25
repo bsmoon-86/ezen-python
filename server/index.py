@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
+import random
 
 ## Flask 클래스 생성
 ## __name__ : 파일의 이름
@@ -28,9 +29,38 @@ def login():
     _pass = request.args.get('pass')
     print(_id, _pass)
     if (_id == 'test') & (_pass == '1234'):
-        return '로그인 성공'
+        return render_template("second.html")
     else:
-        return '로그인 실패'
+        # 로그인 실패시 localhost:5000/main으로 이동
+        return redirect("/main")
     # return _id, _pass
 
-app.run()
+# localhost:5000/data api 생성
+# post 형태로 요청시 
+@app.route('/data', methods=['post'])
+def data():
+    _use = request.form['use']
+    _list = ['바위', '가위', '보']
+    choice_list = random.choice(_list)
+
+    # 무승부 인 경우
+    if _use == choice_list:
+        result = '무승부'
+    elif _use == '바위':
+        if choice_list == '가위':
+            result = '승'
+        else :
+            result = '패'
+    elif _use == '가위':
+        if choice_list == '보':
+            result = '승'
+        else:
+            result = '패'
+    else:
+        if choice_list =='바위':
+            result = '승'
+        else:
+            result = '패'
+    return render_template('result.html', res = result)
+
+app.run(port=8080)
